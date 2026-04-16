@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px; background-color: #fdf8f3;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <img src="~/images/logo.png" alt="PAE" style="height: 80px;" class="mb-3">
+                        <h3 class="fw-bold" style="color: #0d2a4a;">Bienvenido a PAE</h3>
+                        <p class="text-muted small">Portal de Autogestión Educativa</p>
+                    </div>
+
+                    <form asp-action="Ingresar" asp-controller="Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Usuario o Correo</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+                                <input type="text" name="correo" class="form-control" placeholder="correo@ejemplo.com" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock"></i></span>
+                                <input type="password" id="passwordInput" name="password" class="form-control bg-light border-start-0 border-end-0" placeholder="••••••••" required>
+                                <button class="btn btn-light border border-start-0" type="button" onclick="togglePassword()">
+                                    <i id="toggleIcon" class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="text-end mt-2">
+                                <a href="#" class="text-decoration-none small text-muted">¿Olvidó su contraseña?</a>
+                            </div>
+                        </div>
+
+                        <script>
+                            function togglePassword() {
+                                const passwordInput = document.getElementById('passwordInput');
+                                const toggleIcon = document.getElementById('toggleIcon');
+
+                                if (passwordInput.type === 'password') {
+                                    passwordInput.type = 'text';
+                                    toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
+                                } else {
+                                    passwordInput.type = 'password';
+                                    toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
+                                }
+                            }
+                        </script>
+
+                        <button type="submit" class="row btn btn-lg w-100 text-white mb-3" style="background-color: #0d2a4a; border-radius: 10px; border: none; display: flex; justify-content: center; align-items: center;">
+                            Ingresar al Sistema
+                        </button>
+                        <p class="text-danger">@ViewBag.Error</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

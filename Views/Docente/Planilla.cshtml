@@ -1,0 +1,95 @@
+﻿@model List<ProyectoPAE.Models.Usuario>
+@{
+    ViewData["Title"] = "Planilla de Notas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-journal-check text-primary me-2"></i>Planilla de Calificaciones</h2>
+        <a href="@Url.Action("Dashboard", "Home")" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Estudiante</th>
+                        <th>Correo Electrónico</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var estudiante in Model)
+                    {
+                        <tr>
+                            <td>@estudiante.ID_Usuario</td>
+                            <td><strong>@estudiante.NOMBRES @estudiante.APELLIDOS</strong></td>
+                            <td>@estudiante.CORREO_ELECTRONICO</td>
+                            <td class="text-center">
+                                <button class="btn btn-success btn-sm" onclick="abrirModalNota(@estudiante.ID_Usuario, '@estudiante.NOMBRES @estudiante.APELLIDOS')">
+                                    <i class="bi bi-plus-circle"></i> Calificar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="@Url.Action("GuardarNota", "Docente")" method="post">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Registrar Nota para <span id="nombreEstudiante"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="ID_Estudiante" id="idEstudiante" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Materia</label>
+                            <select name="Materia" class="form-select" required>
+                                <option value="Matemáticas">Matemáticas</option>
+                                <option value="Español">Español</option>
+                                <option value="Ciencias">Ciencias</option>
+                                <option value="Inglés">Inglés</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Nota (0.0 - 5.0)</label>
+                                <input type="number" name="Nota" class="form-control" step="0.1" min="0" max="5" required />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Periodo</label>
+                                <select name="Periodo" class="form-select">
+                                    <option value="1">1° Periodo</option>
+                                    <option value="2">2° Periodo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar Calificación</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalNota(id, nombre) {
+            document.getElementById('idEstudiante').value = id;
+            document.getElementById('nombreEstudiante').innerText = nombre;
+            var myModal = new bootstrap.Modal(document.getElementById('modalCalificar'));
+            myModal.show();
+        }
+    </script>
+</div>

@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Blog - Portal de Autogestión Educativa";
+}
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold fs-1" style="color: #0d2a4a;">Actualidad y Consejos Educativos</h1>
+        <p class="text-muted">Recursos y estrategias para modernizar la gestión de tu institución educativa.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="p-4 text-center" style="background-color: #0d2a4a; height: 180px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-journal-check text-white" style="font-size: 4rem;"></i>
+                </div>
+                <div class="card-body p-4">
+                    <span class="badge mb-2" style="background-color: #fdf8f3; color: #e67e22; border: 1px solid #e67e22;">Gestión</span>
+                    <h5 class="card-title fw-bold" style="color: #0d2a4a;">Optimización de procesos académicos</h5>
+                    <p class="card-text text-muted small">Descubre cómo centralizar las calificaciones y asistencias reduce la carga administrativa de los docentes en un 40%, permitiéndoles enfocarse en la enseñanza.</p>
+                    <button class="btn btn-link fw-bold p-0 text-decoration-none" style="color: #e67e22;" data-bs-toggle="modal" data-bs-target="#modalGestion" style="color: #e67e22;">Leer más →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="p-4 text-center" style="background-color: #e67e22; height: 180px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-people-fill text-white" style="font-size: 4rem;"></i>
+                </div>
+                <div class="card-body p-4">
+                    <span class="badge mb-2" style="background-color: #fdf8f3; color: #0d2a4a; border: 1px solid #0d2a4a;">Comunidad</span>
+                    <h5 class="card-title fw-bold" style="color: #0d2a4a;">El rol de los padres en la era digital</h5>
+                    <p class="card-text text-muted small">Exploramos cómo las plataformas de autogestión mejoran el seguimiento del rendimiento escolar desde casa, fortaleciendo el vínculo entre padres y escuela.</p>
+                    <button class="btn btn-link fw-bold p-0 text-decoration-none" style="color: #e67e22;" data-bs-toggle="modal" data-bs-target="#modalComunidad">Leer más →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="p-4 text-center" style="background-color: #fdf8f3; height: 180px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-shield-lock-fill" style="font-size: 4rem; color: #0d2a4a;"></i>
+                </div>
+                <div class="card-body p-4">
+                    <span class="badge mb-2" style="background-color: #0d2a4a; color: white;">Seguridad</span>
+                    <h5 class="card-title fw-bold" style="color: #0d2a4a;">Protección de datos estudiantiles</h5>
+                    <p class="card-text text-muted small">Analizamos la importancia de la ciberseguridad en las instituciones privadas y cómo PAE garantiza que la información sensible siempre esté protegida.</p>
+                    <button class="btn btn-link fw-bold p-0 text-decoration-none" style="color: #e67e22;" data-bs-toggle="modal" data-bs-target="#modalSeguridad">Leer más →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalGestion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; background-color: #fdf8f3;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" style="color: #0d2a4a;">Optimización de Procesos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-muted">
+                    <p>La digitalización no es solo pasar papel a la pantalla; es transformar la operatividad. Con <strong>PAE</strong>, los docentes pueden cargar notas en tiempo real desde sus móviles, generando boletines automáticos al final del periodo.</p>
+                    <ul>
+                        <li>Reducción de errores manuales.</li>
+                        <li>Acceso inmediato a historiales académicos.</li>
+                        <li>Generación de reportes para secretaría en segundos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalComunidad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; background-color: #fdf8f3;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" style="color: #0d2a4a;">Comunidad Educativa Digital</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-muted">
+                    <p>Un padre informado es un padre comprometido. El portal permite que los acudientes reciban notificaciones sobre inasistencias, circulares importantes y el progreso diario de sus hijos.</p>
+                    <p>Esto reduce significativamente las llamadas innecesarias a la institución y mejora la percepción de transparencia del colegio.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSeguridad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; background-color: #fdf8f3;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" style="color: #0d2a4a;">Seguridad de la Información</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-muted">
+                    <p>Entendemos que manejas datos de menores de edad. Por eso, <strong>PAE</strong> utiliza cifrado de nivel bancario y servidores protegidos.</p>
+                    <p>Cumplimos con las normativas locales de protección de datos personales (Habeas Data), asegurando que solo el personal autorizado acceda a la información sensible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

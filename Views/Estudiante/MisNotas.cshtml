@@ -1,0 +1,20 @@
+﻿@model List<ProyectoPAE.Models.Calificacion>
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-person-badge text-primary"></i> Mi Reporte de Notas</h2>
+    <div class="row">
+        @foreach (var nota in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@nota.Materia</h5>
+                        <p class="card-text mb-0">Periodo: @nota.Periodo</p>
+                        <h3 class="mt-2 @(nota.Nota >= 3 ? "text-success" : "text-danger")">@nota.Nota</h3>
+                        <small class="text-muted">Registrado el: @nota.FechaRegistro.ToShortDateString()</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

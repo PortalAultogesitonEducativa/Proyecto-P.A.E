@@ -1,0 +1,845 @@
+﻿@{
+    ViewData["Title"] = "Panel de Control Educativo";
+    @using Microsoft.AspNetCore.Http
+}
+
+@{
+    var nombre = Context.Session.GetString("NombreUsuario");
+    var rol = Context.Session.GetString("UserRol");
+}
+
+<input type="hidden" id="rolOculto" value="@rol" />
+
+<h2>Bienvenido/a, @nombre</h2>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rolActivo = document.getElementById('rolOculto').value;
+
+        // Usamos tu función switchRole que ya existe,
+        // pero le pasamos el valor automáticamente
+        document.getElementById('roleSelector').value = rolActivo;
+        switchRole();
+
+        // OPCIONAL: Esconder el selector para que el usuario no cambie de rol
+        document.getElementById('roleSelector').style.display = 'none';
+    });
+</script>
+
+<div class="container-fluid fw-bold py-3 mb-4" style="background-color: #0d2a4a; color: white;">
+    <div class="container d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-mortarboard-fill me-2"></i>SISTEMA DE GESTIÓN PAE</span>
+        <div class="d-flex align-items-center gap-2">
+            <small class="opacity-75">Rol actual:</small>
+            <select id="roleSelector" class="form-select form-select-sm" onchange="switchRole()" style="width: auto;">
+                <option value="admin">Administrador</option>
+                <option value="docente">Docente</option>
+                <option value="estudiante">Estudiante</option>
+                <option value="acudiente">Acudiente</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+
+    <div id="panel-admin" class="role-panel d-none">
+
+        <div id="admin-main">
+            <h2 class="mb-4" style="color: #e67e22;"><i class="bi bi-gear-fill me-2"></i>Gestión Administrativa</h2>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-3" onclick="verMatricula()" style="cursor: pointer;">
+                    <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover">
+                        <i class="bi bi-clipboard-check fs-2 mb-2" style="color: #e67e22;"></i>
+                        <h6>Matrículas</h6>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <a href="/Admin/Usuarios" class="text-decoration-none h-100">
+                        <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover" style="cursor: pointer;">
+                            <i class="bi bi-people fs-2 mb-2" style="color: #e67e22;"></i>
+                            <h6 class="text-dark">Usuarios y Roles</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3" onclick="verCertificados()" style="cursor: pointer;">
+                    <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover">
+                        <i class="bi bi-file-earmark-pdf fs-2 mb-2" style="color: #e67e22;"></i>
+                        <h6>Certificados</h6>
+                    </div>
+                </div>
+                <div class="col-md-3" onclick="verNotificaciones()" style="cursor: pointer;">
+                    <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover">
+                        <i class="bi bi-megaphone fs-2 mb-2" style="color: #e67e22;"></i>
+                        <h6>Notificaciones</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3" onclick="verAsignacion()" style="cursor: pointer;">
+                    <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover" style="border-left: 4px solid #e67e22 !important;">
+                        <i class="bi bi-diagram-3 fs-2 mb-2" style="color: #d35400;"></i>
+                        <h6>Asignación Académica</h6>
+                    </div>
+                </div>
+                <div class="col-md-3" onclick="verReportes()" style="cursor: pointer;">
+                    <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover" style="border-left: 4px solid #e67e22 !important;">
+                        <i class="bi bi-graph-up-arrow fs-2 mb-2" style="color: #d35400;"></i>
+                        <h6>Reportes Pro</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-matricula" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-clipboard-check me-2"></i>Matrículas</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <h5>Registro de Estudiantes</h5>
+                <hr>
+                <div class="row g-3">
+                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Nombre completo"></div>
+                    <div class="col-md-4"><select class="form-select"><option>Seleccionar Grado</option></select></div>
+                    <div class="col-md-2"><button class="btn btn-warning text-white w-100">Guardar</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-usuarios" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-people-fill me-2"></i>Gestión de Usuarios</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <table class="table table-hover bg-white shadow-sm rounded">
+                <thead class="table-light"><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead>
+                <tbody><tr><td>admin_pae</td><td><span class="badge bg-warning">Admin</span></td><td><button class="btn btn-sm btn-light border">Editar</button></td></tr></tbody>
+            </table>
+        </div>
+
+        <div id="admin-certificados" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-file-earmark-pdf-fill me-2"></i>Certificados</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <input type="text" class="form-control mb-3" placeholder="Buscar por documento...">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between">Certificado de Matrícula <i class="bi bi-download text-danger"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-notificaciones" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-megaphone-fill me-2"></i>Notificaciones</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <textarea class="form-control mb-3" rows="3" placeholder="Escriba el comunicado general..."></textarea>
+                <button class="btn btn-warning text-white">Enviar a toda la institución</button>
+            </div>
+        </div>
+
+        <div id="admin-asignacion" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-diagram-3-fill me-2"></i>Asignación Académica</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <div class="alert alert-info">Seleccione un docente para asignar sus materias y grupos correspondientes.</div>
+        </div>
+
+        <div id="admin-reportes" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #e67e22;"><i class="bi bi-graph-up-arrow me-2"></i>Reportes Pro</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverAdmin()">Volver</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6"><div class="card p-4 border-0 shadow-sm text-center"><h1 class="text-warning">92%</h1><p>Asistencia General</p></div></div>
+                <div class="col-md-6"><div class="card p-4 border-0 shadow-sm text-center"><h1 class="text-warning">4.1</h1><p>Promedio Institucional</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-docente" class="role-panel d-none">
+
+        <div id="docente-main">
+            <h2 class="mb-4" style="color: #2980b9;"><i class="bi bi-person-badge-fill me-2"></i>Panel del Docente</h2>
+            <div class="row g-3">
+                <<div class="col-md-3">
+                    <a href="/Docente/Planilla" class="text-decoration-none">
+                        <div class="card p-3 shadow-sm border-0 h-100 text-center card-hover" style="cursor: pointer;">
+                            <i class="bi bi-clipboard-check fs-2 mb-2" style="color: #007bff;"></i>
+                            <h6 class="text-dark">Planilla de Notas</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4" onclick="verAsistencia()" style="cursor: pointer;">
+                    <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #2980b9 !important;">
+                        <i class="bi bi-calendar-check fs-2 mb-2" style="color: #2980b9;"></i>
+                        <h5>Asistencia</h5>
+                        <p class="small text-muted">Toma de lista diaria.</p>
+                    </div>
+                </div>
+                <div class="col-md-4" onclick="verObservaciones()" style="cursor: pointer;">
+                    <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #2980b9 !important;">
+                        <i class="bi bi-chat-dots fs-2 mb-2" style="color: #2980b9;"></i>
+                        <h5>Observador</h5>
+                        <p class="small text-muted">Seguimiento convivencial.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="docente-observaciones" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #2980b9;"><i class="bi bi-eye me-2"></i>Observador del Alumno</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverDocente()">Volver</button>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h5 class="mb-3 text-secondary">Crear Nueva Observación</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Estudiante</label>
+                        <select class="form-select">
+                            <option>Ospina Juan Pablo</option>
+                            <option>García María</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Tipo de Nota</label>
+                        <select class="form-select">
+                            <option class="text-success">Positiva / Mérito</option>
+                            <option class="text-danger">Llamado de Atención</option>
+                            <option class="text-warning">Seguimiento Académico</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Descripción del Evento</label>
+                        <textarea class="form-control" rows="3" placeholder="Detalle lo sucedido..."></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button class="btn btn-primary"><i class="bi bi-save me-2"></i>Registrar en Observador</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="docente-planilla" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #2980b9;"><i class="bi bi-pencil-square me-2"></i>Planilla de Calificaciones</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverDocente()">Volver</button>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Asignatura</label>
+                        <select class="form-select"><option>Matemáticas - 6°A</option></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Periodo</label>
+                        <select class="form-select"><option>Primer Periodo</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-3">Estudiante</th>
+                            <th class="text-center">Tarea 1 (20%)</th>
+                            <th class="text-center">Examen (40%)</th>
+                            <th class="text-center">Actitudinal (20%)</th>
+                            <th class="text-center">Definitiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="ps-3 fw-bold">Ospina Juan Pablo</td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="4.5" step="0.1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="3.8" step="0.1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="5.0" step="0.1"></td>
+                            <td class="text-center"><span class="badge bg-success fs-6">4.2</span></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-bold">García María</td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="3.0" step="0.1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="2.5" step="0.1"></td>
+                            <td><input type="number" class="form-control form-control-sm text-center" value="4.0" step="0.1"></td>
+                            <td class="text-center"><span class="badge bg-danger fs-6">2.9</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="p-3 bg-light text-end">
+                    <button class="btn btn-primary"><i class="bi bi-save me-2"></i>Guardar Calificaciones</button>
+                </div>
+            </div>
+        </div>
+        <div id="docente-asistencia" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #2980b9;"><i class="bi bi-calendar-check me-2"></i>Control de Asistencia</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverDocente()">Volver</button>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Fecha</label>
+                        <input type="date" class="form-control" value="2024-03-15">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Grupo</label>
+                        <select class="form-select"><option>6° Grado - A</option></select>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-success"><i class="bi bi-check-all me-2"></i>Marcar todos como Presente</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Estudiante</th>
+                            <th class="text-center">Estado</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Ospina Juan Pablo</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <input type="radio" class="btn-check" name="ast1" id="p1" checked>
+                                    <label class="btn btn-outline-success" for="p1">P</label>
+                                    <input type="radio" class="btn-check" name="ast1" id="f1">
+                                    <label class="btn btn-outline-danger" for="f1">F</label>
+                                    <input type="radio" class="btn-check" name="ast1" id="r1">
+                                    <label class="btn btn-outline-warning" for="r1">R</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="form-control form-control-sm" placeholder="Opcional..."></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">García María</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <input type="radio" class="btn-check" name="ast2" id="p2" checked>
+                                    <label class="btn btn-outline-success" for="p2">P</label>
+                                    <input type="radio" class="btn-check" name="ast2" id="f2">
+                                    <label class="btn btn-outline-danger" for="f2">F</label>
+                                    <input type="radio" class="btn-check" name="ast2" id="r2">
+                                    <label class="btn btn-outline-warning" for="r2">R</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="form-control form-control-sm" placeholder="Opcional..."></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-acudiente" class="role-panel d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 style="color: #27ae60;"><i class="bi bi-person-heart me-2"></i>Panel de Padres</h2>
+
+            <div class="d-flex align-items-center bg-success text-white px-3 py-1 rounded-pill shadow-sm">
+                <span class="small me-2 fw-bold">Hijo(a):</span>
+                <select id="selectHijo" class="form-select form-select-sm border-0 bg-transparent text-white p-0 fw-bold" style="box-shadow: none; cursor: pointer; min-width: 150px;">
+                    @if (ViewBag.ListaHijos != null)
+                    {
+                        foreach (var hijo in ViewBag.ListaHijos)
+                        {
+                            <option value="@hijo.ID_Usuario" class="text-dark">
+                                @hijo.NOMBRES @hijo.APELLIDOS
+                            </option>
+                        }
+                    }
+                    else
+                    {
+                        <option class="text-dark">Cargando estudiantes...</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #27ae60 !important;">
+                    <i class="bi bi-journal-text fs-2 mb-2" style="color: #27ae60;"></i>
+                    <h5>Ver Calificaciones</h5>
+                    <p class="small text-muted">Promedio actual: <strong class="text-success">@ViewBag.PromedioRapido</strong></p>
+                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalCalificaciones">
+                        Ver Reporte
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #27ae60 !important;">
+                    <i class="bi bi-calendar-check fs-2 mb-2" style="color: #27ae60;"></i>
+                    <h5>Asistencia</h5>
+                    <p class="small text-muted">Fallas registradas: <strong class="text-danger">@ViewBag.FallasRapidas</strong></p>
+                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAsistencia">
+                        Ver Detalle
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #27ae60 !important;">
+                    <i class="bi bi-chat-left-dots fs-2 mb-2" style="color: #27ae60;"></i>
+                    <h5>Citaciones</h5>
+                    <p class="small text-muted">Mensajes directos de los docentes.</p>
+                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalCitaciones">
+                        Ir a Mensajes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-estudiante" class="role-panel d-none">
+        <div id="estudiante-main">
+            <h2 class="mb-4" style="color: #6f42c1;"><i class="bi bi-mortarboard-fill me-2"></i>Mi Panel Académico</h2>
+
+            <div class="row g-3">
+                <div class="col-md-4" onclick="verHorario()" style="cursor: pointer;">
+                    <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #6f42c1 !important;">
+                        <i class="bi bi-calendar3 fs-2 mb-2" style="color: #6f42c1;"></i>
+                        <h5>Horario de Clases</h5>
+                        <p class="small text-muted">Consulta tus materias y salones.</p>
+                        <button class="btn btn-sm btn-outline-primary" style="border-color: #6f42c1; color: #6f42c1;">Ver Horario</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card p-4 text-center border-0 shadow-sm card-hover"
+                         style="border-top: 4px solid #6f42c1 !important; cursor: pointer;"
+                         onclick="location.href='@Url.Action("MisNotas", "Estudiante")'">
+
+                        <i class="bi bi-file-earmark-bar-graph fs-2 mb-2" style="color: #6f42c1;"></i>
+                        <h5 style="color: #6f42c1;">Mis Calificaciones</h5>
+                        <p class="small text-muted">Consulta tu rendimiento académico.</p>
+
+                        <button class="btn btn-sm btn-outline-primary"
+                                style="border-color: #6f42c1; color: #6f42c1;">
+                            Ver Notas
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="card p-4 text-center border-0 shadow-sm card-hover" style="border-top: 4px solid #6f42c1 !important;">
+                        <i class="bi bi-list-task fs-2 mb-2" style="color: #6f42c1;"></i>
+                        <h5>Actividades</h5>
+                        <p class="small text-muted">Tareas y trabajos pendientes.</p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="verActividadesEstudiante()">Ver Tareas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="estudiante-horario" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #6f42c1;"><i class="bi bi-calendar3 me-2"></i>Mi Horario</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverEstudiante()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Hora</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaNotasBody">
+                        @if (ViewBag.DetalleNotas != null)
+                        {
+                            foreach (var nota in ViewBag.DetalleNotas)
+                            {
+                                <tr>
+                                    <td>Materia @nota.id_materia</td>
+                                    <td>@nota.tipo_evaluacion</td>
+                                    <td>@nota.fecha_evaluacion.ToShortDateString()</td>
+                                    <td class="text-center fw-bold @(nota.nota < 3 ? "text-danger" : "text-success")">@nota.nota</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center">No hay notas registradas.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="estudiante-calificaciones" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #6f42c1;"><i class="bi bi-journal-check me-2"></i>Mis Calificaciones</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverEstudiante()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Asignatura</th>
+                            <th>Tarea 1</th>
+                            <th>Examen</th>
+                            <th>Definitiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Matemáticas</td>
+                            <td>4.5</td>
+                            <td>3.8</td>
+                            <td><span class="badge bg-success">4.2</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="estudiante-actividades" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 style="color: #6f42c1;"><i class="bi bi-list-task me-2"></i>Tareas y Trabajos</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="volverEstudiante()">Volver</button>
+            </div>
+            <div class="card border-0 shadow-sm p-4">
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Taller de Álgebra</h6>
+                            <small class="text-muted">Fecha límite: 20 de Marzo</small>
+                        </div>
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalCalificaciones" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-journal-text me-2"></i>Boletín de Calificaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Materia/Asignatura</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha</th>
+                                    <th class="text-center">Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaNotasBody">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Cargando información...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCalificaciones" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-journal-text me-2"></i>Boletín de Calificaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Materia</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha</th>
+                                    <th class="text-center">Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.DetalleNotas != null)
+                                {
+                                    foreach (var nota in (List<ProyectoPAE.Models.Evaluacion>)ViewBag.DetalleNotas)
+                                    {
+                                        <tr>
+                                            <td>@(nota.id_materia == 1 ? "Matemáticas" : nota.id_materia == 2 ? "Español" : "Otras")</td>
+                                            <td>@nota.tipo_evaluacion</td>
+                                            <td>@nota.fecha_evaluacion.ToShortDateString()</td>
+                                            <td class="text-center fw-bold @(nota.nota < 3 ? "text-danger" : "text-success")">@nota.nota</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" class="text-center text-muted">No hay notas registradas.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAsistencia" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-calendar-check me-2"></i>Detalle de Asistencia</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h3 class="display-4 text-danger">@ViewBag.FallasRapidas</h3>
+                    <p class="text-muted">Fallas totales en el periodo actual</p>
+                    <hr>
+                    <p class="small text-start text-muted italic">Próximamente: Listado detallado de fechas e inasistencias.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCitaciones" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-envelope-paper me-2"></i>Buzón de Citaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="listaCitaciones">
+                        @if (ViewBag.ListaCitaciones != null && ((List<ProyectoPAE.Models.Citacion>)ViewBag.ListaCitaciones).Any())
+                        {
+                            foreach (var cita in (List<ProyectoPAE.Models.Citacion>)ViewBag.ListaCitaciones)
+                            {
+                                <div class="alert alert-light border shadow-sm mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="fw-bold text-success mb-1">@cita.asunto</h6>
+                                        <span class="badge bg-secondary">@cita.fecha.ToShortDateString()</span>
+                                    </div>
+                                    <p class="mb-2 text-dark" style="font-size: 0.9rem;">@cita.mensaje</p>
+                                    <div class="border-top pt-2 mt-1">
+                                        <small class="text-muted"><strong>Remitente:</strong> @cita.remitente</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-chat-left-x fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">No tienes citaciones o mensajes pendientes.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ocultarTodo() {
+        const subs = [
+            'admin-main', 'admin-matricula', 'admin-usuarios', 'admin-certificados', 'admin-notificaciones', 'admin-asignacion', 'admin-reportes',
+            'docente-main', 'docente-planilla', 'docente-asistencia', 'docente-observaciones',
+            'estudiante-main',
+            'estudiante-horario',
+            'estudiante-calificaciones',
+            'estudiante-actividades'
+        ];
+
+        const panelesPrincipales = [
+            'panel-admin', 'panel-docente', 'panel-estudiante', 'panel-acudiente'
+        ];
+
+        subs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('d-none');
+        });
+
+        panelesPrincipales.forEach(id => {
+            const p = document.getElementById(id);
+            if (p) p.classList.add('d-none');
+        });
+    }
+
+    // Funciones de navegación Admin
+    function verMatricula() { ocultarTodo(); mostrarAdminSub('admin-matricula'); }
+    function verUsuarios() { ocultarTodo(); mostrarAdminSub('admin-usuarios'); }
+    function verCertificados() { ocultarTodo(); mostrarAdminSub('admin-certificados'); }
+    function verNotificaciones() { ocultarTodo(); mostrarAdminSub('admin-notificaciones'); }
+    function verAsignacion() { ocultarTodo(); mostrarAdminSub('admin-asignacion'); }
+    function verReportes() { ocultarTodo(); mostrarAdminSub('admin-reportes'); }
+
+    function mostrarAdminSub(id) {
+        ocultarTodo();
+        document.getElementById('panel-admin').classList.remove('d-none');
+        const subSeccion = document.getElementById(id);
+        if (subSeccion) {
+            subSeccion.classList.remove('d-none');
+        }
+    }
+
+    function volverAdmin() {
+        ocultarTodo();
+        document.getElementById('panel-admin').classList.remove('d-none');
+        document.getElementById('admin-main').classList.remove('d-none'); 
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const rolDesdeSesion = document.getElementById('rolOculto').value;
+        const selector = document.getElementById('roleSelector');
+
+        if (selector && rolDesdeSesion) {
+            // Sincronizamos el selector con el rol del login
+            selector.value = rolDesdeSesion;
+
+            // Ejecutamos la vista inicial
+            switchRole();
+
+            // Lógica de visibilidad del selector:
+            if (rolDesdeSesion !== 'admin') {
+                // Si NO es admin, escondemos el selector para que no "salte" de rol
+                selector.style.display = 'none';
+                // También puedes esconder el texto "Rol actual:" si quieres
+                document.querySelector('.opacity-75').style.display = 'none';
+            } else {
+                // Si ES admin, nos aseguramos de que el selector sea visible
+                selector.style.display = 'block';
+                console.log("Modo Administrador: Selector de roles habilitado.");
+            }
+        }
+    });
+
+    function switchRole() {
+        const role = document.getElementById('roleSelector').value.toLowerCase();
+        console.log("Cambiando al rol: " + role);
+
+        ocultarTodo();
+
+        const panel = document.getElementById('panel-' + role);
+
+        if (panel) {
+            panel.classList.remove('d-none');
+
+            // AGREGAR ESTO: Instrucciones para mostrar el contenido de cada rol
+            if (role === 'admin') {
+                const sub = document.getElementById('admin-main');
+                if (sub) sub.classList.remove('d-none');
+            }
+            else if (role === 'docente') {
+                const sub = document.getElementById('docente-main');
+                if (sub) sub.classList.remove('d-none'); // Esto encenderá las tarjetas de Carlos Mendoza
+            }
+            else if (role === 'estudiante') {
+                const sub = document.getElementById('estudiante-main');
+                if (sub) sub.classList.remove('d-none'); // Esto encenderá las tarjetas de Laura Gómez
+            }
+            // El acudiente no necesita esto porque su panel no tiene sub-secciones aún
+        } else {
+            console.error("No se encontró un panel con el ID: panel-" + role);
+        }
+    }
+    // Al cargar la página
+    document.addEventListener("DOMContentLoaded", function () {
+        switchRole();
+    });
+
+    // Navegación Docente
+    function verPlanilla() {
+        ocultarTodo();
+        document.getElementById('panel-docente').classList.remove('d-none');
+        document.getElementById('docente-planilla').classList.remove('d-none');
+    }
+
+    function verAsistencia() {
+        ocultarTodo();
+        document.getElementById('panel-docente').classList.remove('d-none');
+        document.getElementById('docente-asistencia').classList.remove('d-none');
+    }
+
+    function volverDocente() {
+        ocultarTodo();
+        document.getElementById('panel-docente').classList.remove('d-none');
+        document.getElementById('docente-main').classList.remove('d-none');
+    }
+
+    function verObservaciones() {
+        ocultarTodo(); // Limpia la pantalla usando la lista 'subs'
+
+        // Muestra el contenedor del docente
+        const panel = document.getElementById('panel-docente');
+        if (panel) panel.classList.remove('d-none');
+
+        // Muestra específicamente el formulario del observador
+        const subVista = document.getElementById('docente-observaciones');
+        if (subVista) subVista.classList.remove('d-none');
+    }
+
+    // Navegación Estudiante
+    function verHorario() {
+        ocultarTodo();
+        document.getElementById('panel-estudiante').classList.remove('d-none');
+        document.getElementById('estudiante-horario').classList.remove('d-none');
+    }
+
+    function verCalificacionesEstudiante() {
+        ocultarTodo();
+        document.getElementById('panel-estudiante').classList.remove('d-none');
+        document.getElementById('estudiante-calificaciones').classList.remove('d-none');
+    }
+
+    function verActividadesEstudiante() {
+        ocultarTodo();
+
+        document.getElementById('panel-estudiante').classList.remove('d-none');
+
+        const divTareas = document.getElementById('estudiante-actividades');
+        if (divTareas) {
+            divTareas.classList.remove('d-none');
+        }
+    }
+
+    function volverEstudiante() {
+        switchRole();
+        ocultarTodo();
+        document.getElementById('panel-estudiante').classList.remove('d-none');
+        document.getElementById('estudiante-main').classList.remove('d-none');
+    }
+</script>
+
+<style>
+    .card-hover:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        background-color: #fffaf5;
+    }
+</style>
