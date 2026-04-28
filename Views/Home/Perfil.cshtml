@@ -1,0 +1,68 @@
+﻿@model ProyectoPAE.Models.Usuario
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    @if (!string.IsNullOrEmpty(Model.FOTO_URL))
+                    {
+                        <img src="@Model.FOTO_URL" class="rounded-circle border border-white border-3 shadow"
+                             style="width: 120px; height: 120px; object-fit: cover;" alt="Foto de Perfil" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                    }
+                    <h2 class="mt-2">@Model.NOMBRES</h2>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="text-muted small">Nombres y Apellidos</label>
+                        <p class="h5 border-bottom pb-2">@Model.NOMBRES @Model.APELLIDOS</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Correo Electrónico</label>
+                            <p class="h6 border-bottom pb-2">@Model.CORREO_ELECTRONICO</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Teléfono</label>
+                            <p class="h6 border-bottom pb-2">@(Model.TELEFONO ?? "No registrado")</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Dirección de Residencia</label>
+                        <p class="h6 border-bottom pb-2">@(Model.DIRECCION ?? "No registrada")</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label class="text-muted small d-block">Rol en el Sistema</label>
+                            <span class="badge bg-info text-dark fs-6">@Model.ROL.ToUpper()</span>
+                        </div>
+                        <div class="text-end">
+                            <label class="text-muted small d-block">Estado</label>
+                            <span class="text-success fw-bold">
+                                <i class="bi bi-check-circle-fill"></i> Activo
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <a asp-action="EditarPerfil" asp-controller="Home" class="btn btn-primary">
+                            <i class="bi bi-pencil-square me-2"></i>Actualizar mis datos
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-footer text-center bg-light">
+                    <small class="text-muted">Miembro desde el sistema PAE</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

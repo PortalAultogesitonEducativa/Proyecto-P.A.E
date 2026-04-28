@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Nueva contraseña";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5" style="max-width:420px; margin:auto">
+    <h4>Establece tu nueva contraseña</h4>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post" action="/Login/GuardarNuevaContraseña">
+        <input type="hidden" name="token" value="@ViewBag.Token" />
+
+        <div class="mb-3">
+            <label>Nueva contraseña</label>
+            <input type="password" name="nuevaPassword" class="form-control"
+                   minlength="8" required />
+        </div>
+
+        <div class="mb-3">
+            <label>Confirmar contraseña</label>
+            <input type="password" name="confirmar" class="form-control"
+                   minlength="8" required />
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Guardar contraseña</button>
+    </form>
+</div>

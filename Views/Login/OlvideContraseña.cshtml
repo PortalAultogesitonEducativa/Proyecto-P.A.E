@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Recuperar contraseña";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5" style="max-width:420px; margin:auto">
+    <h4>¿Olvidaste tu contraseña?</h4>
+    <p class="text-muted">Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
+
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-success">@ViewBag.Mensaje</div>
+    }
+
+    <form method="post" action="/Login/SolicitarRecuperacion">
+        <div class="mb-3">
+            <label>Correo electrónico</label>
+            <input type="email" name="correo" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Enviar enlace</button>
+    </form>
+
+    <a href="/Login" class="d-block mt-3 text-center">← Volver al inicio de sesión</a>
+</div>

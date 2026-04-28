@@ -42,13 +42,18 @@ namespace ProyectoPAE.Controllers
         [HttpPost]
         public IActionResult RegistrarEstudiante(Usuario nuevoEstudiante, int CursoSeleccionado)
         {
-            // 1. Verificar si el correo ya existe antes de hacer nada
+            // 1. Verificar si el correo ya existe
             var existe = _context.Usuarios.Any(u => u.CORREO_ELECTRONICO == nuevoEstudiante.CORREO_ELECTRONICO);
             if (existe)
             {
-                // Podrías mandar un mensaje de error a la vista aquí
+                TempData["Error"] = "Este correo ya está registrado.";
                 return RedirectToAction("Usuarios");
             }
+
+            // --- EL CAMBIO CLAVE ESTÁ AQUÍ ---
+            // Si no le das un nombre de usuario, SQL lanza el error de duplicado
+            nuevoEstudiante.NOMBRE_USUARIO = nuevoEstudiante.CORREO_ELECTRONICO;
+            // ---------------------------------
 
             nuevoEstudiante.ROL = "estudiante";
             nuevoEstudiante.ACTIVO = true;
@@ -56,23 +61,31 @@ namespace ProyectoPAE.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Usuarios.Add(nuevoEstudiante);
-                _context.SaveChanges(); // Aquí se detuvo antes
-
-                var nuevaMatricula = new Matricula
+                try
                 {
-                    id_estudiante = nuevoEstudiante.ID_Usuario,
-                    id_curso = CursoSeleccionado,
-                    fecha_matricula = DateTime.Now,
-                    periodo_academico = "2026-I",
-                    estado = "Activa",
-                    ano = 2026
-                };
+                    _context.Usuarios.Add(nuevoEstudiante);
+                    _context.SaveChanges(); // Aquí ya no debería saltar el error
 
-                _context.Matriculas.Add(nuevaMatricula);
-                _context.SaveChanges();
+                    var nuevaMatricula = new Matricula
+                    {
+                        id_estudiante = nuevoEstudiante.ID_Usuario,
+                        id_curso = CursoSeleccionado,
+                        fecha_matricula = DateTime.Now,
+                        periodo_academico = "2026-I",
+                        estado = "Activa",
+                        ano = 2026
+                    };
 
-                return RedirectToAction("Usuarios");
+                    _context.Matriculas.Add(nuevaMatricula);
+                    _context.SaveChanges();
+
+                    return RedirectToAction("Usuarios");
+                }
+                catch (Exception ex)
+                {
+                    // Si algo falla, esto te ayudará a ver qué pasó sin que se cierre la app
+                    ModelState.AddModelError("", "Error al guardar: " + ex.Message);
+                }
             }
             return View("Usuarios", _context.Usuarios.ToList());
         }
@@ -100,6 +113,27 @@ namespace ProyectoPAE.Controllers
 
                 _context.Matriculas.Add(nuevaMatricula);
                 _context.SaveChanges();
+            }
+
+            return RedirectToAction("Usuarios");
+        }
+        [HttpPost]
+        public IActionResult CambiarRol(int idUsuario, string nuevoRol)
+        {
+            var usuario = _context.Usuarios.Find(idUsuario);
+
+            // REGLAS DE ORO:
+            // 1. No se puede editar al Admin Principal (ID 1).
+            // 2. El nuevo rol no puede ser 'admin'.
+            // 3. Solo permitimos cambiar a quienes son docentes o coordinadores.
+
+            if (usuario != null && usuario.ID_Usuario != 1 && nuevoRol != "admin")
+            {
+                if (usuario.ROL == "docente" || usuario.ROL == "coordinador")
+                {
+                    usuario.ROL = nuevoRol;
+                    _context.SaveChanges();
+                }
             }
 
             return RedirectToAction("Usuarios");

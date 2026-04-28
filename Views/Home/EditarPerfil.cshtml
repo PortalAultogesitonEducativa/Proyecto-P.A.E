@@ -1,0 +1,32 @@
+﻿@model ProyectoPAE.Models.Usuario
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white p-3">
+            <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Mi Perfil</h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="ActualizarPerfil" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Correo Electrónico</label>
+                        <input asp-for="CORREO_ELECTRONICO" class="form-control" type="email" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Teléfono</label>
+                        <input asp-for="TELEFONO" class="form-control" type="tel" />
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Dirección de Residencia</label>
+                        <input asp-for="DIRECCION" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end">
+                    <a asp-action="Perfil" class="btn btn-outline-secondary me-2">Cancelar</a>
+                    <button type="submit" class="btn btn-success px-4">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

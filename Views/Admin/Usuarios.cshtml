@@ -98,9 +98,47 @@
                                 </button>
                             </form>
                         }
+                        @if (user.ROL == "docente" || user.ROL == "coordinador")
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="abrirModalRol('@user.ID_Usuario', '@user.ROL')">
+                                <i class="bi bi-pencil-square"></i> Cambiar Rol
+                            </button>
+                        }
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    <div class="modal fade" id="modalCambiarRol" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <form asp-action="CambiarRol" method="post">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Cambiar Cargo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="idUsuario" id="rolUsuarioId" />
+                        <label class="form-label">Seleccione el nuevo rol:</label>
+                        <select name="nuevoRol" class="form-select" required>
+                            <option value="docente">Docente</option>
+                            <option value="coordinador">Coordinador</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+            function abrirModalRol(id, rolActual) {
+                document.getElementById('rolUsuarioId').value = id; // Pone el ID en el input oculto
+                // Opcional: puedes preseleccionar el rol actual en el select si quieres
+                var myModal = new bootstrap.Modal(document.getElementById('modalCambiarRol'));
+                myModal.show();
+            }
+    </script>
 </div>

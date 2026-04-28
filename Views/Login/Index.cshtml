@@ -32,23 +32,23 @@
                                 </button>
                             </div>
                             <div class="text-end mt-2">
-                                <a href="#" class="text-decoration-none small text-muted">¿Olvidó su contraseña?</a>
+                                <a href="/Login/OlvideContraseña" class="text-decoration-none small text-muted">¿Olvidó su contraseña?</a>
                             </div>
                         </div>
 
                         <script>
-                            function togglePassword() {
-                                const passwordInput = document.getElementById('passwordInput');
-                                const toggleIcon = document.getElementById('toggleIcon');
+                                                    function togglePassword() {
+                                                        const passwordInput = document.getElementById('passwordInput');
+                                                        const toggleIcon = document.getElementById('toggleIcon');
 
-                                if (passwordInput.type === 'password') {
-                                    passwordInput.type = 'text';
-                                    toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
-                                } else {
-                                    passwordInput.type = 'password';
-                                    toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
-                                }
-                            }
+                                                        if (passwordInput.type === 'password') {
+                                                            passwordInput.type = 'text';
+                                                            toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
+                                                        } else {
+                                                            passwordInput.type = 'password';
+                                                            toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
+                                                        }
+                                                    }
                         </script>
 
                         <button type="submit" class="row btn btn-lg w-100 text-white mb-3" style="background-color: #0d2a4a; border-radius: 10px; border: none; display: flex; justify-content: center; align-items: center;">

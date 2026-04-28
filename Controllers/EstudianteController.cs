@@ -9,17 +9,20 @@ public class EstudianteController : Controller
 
     public IActionResult MisNotas()
     {
-        // Obtenemos el ID del usuario que está logueado
-        var userIdStr = HttpContext.Session.GetString("UserId");
-        if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Index", "Login");
+        // 1. Obtenemos el ID de la sesión como texto
+        var userIdStr = HttpContext.Session.GetString("UserIdStr");
 
-        int userId = int.Parse(userIdStr);
+        // 2. Intentamos convertirlo de forma segura
+        if (int.TryParse(userIdStr, out int userId))
+        {
+            // Si la conversión es exitosa, buscamos las notas
+            var notas = _context.Calificaciones
+                                .Where(n => n.ID_Estudiante == userId)
+                                .ToList();
+            return View(notas);
+        }
 
-        // Traemos las notas de la DB que pertenezcan a este ID
-        var notas = _context.Calificaciones
-                            .Where(n => n.ID_Estudiante == userId)
-                            .ToList();
-
-        return View(notas);
+        // 3. Si el ID es inválido o nulo, mandamos al login en lugar de dar error
+        return RedirectToAction("Index", "Login");
     }
 }

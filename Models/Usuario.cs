@@ -16,6 +16,9 @@ namespace ProyectoPAE.Models
         public DateTime? FECHA_CREACION { get; set; }
         public bool ACTIVO { get; set; }
         public string? ROL { get; set; }
+        public string? TELEFONO { get; set; }
+        public string? DIRECCION { get; set; }
+        public string? FOTO_URL { get; set; }
     }
 
     [Table("ESTUDIANTE_PADRE")]

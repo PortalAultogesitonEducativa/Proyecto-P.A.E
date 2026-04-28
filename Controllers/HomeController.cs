@@ -49,67 +49,126 @@ namespace ProyectoPAE.Controllers
             // 1. Recuperamos los datos de la sesión
             var nombreUsuario = HttpContext.Session.GetString("NombreUsuario");
             var rol = HttpContext.Session.GetString("UserRol");
-            var userIdStr = HttpContext.Session.GetString("UserId");
+            var userIdStr = HttpContext.Session.GetString("UserIdStr");
 
-            // 2. Verificación de seguridad básica
-            if (string.IsNullOrEmpty(nombreUsuario) || string.IsNullOrEmpty(userIdStr))
+            // 2. Verificación de seguridad: si no hay sesión, al Login
+            if (string.IsNullOrEmpty(nombreUsuario) || string.IsNullOrEmpty(rol))
             {
-                return RedirectToAction("Login", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
-            // 3. Pasamos datos comunes a la vista
             ViewBag.Nombre = nombreUsuario;
             ViewBag.Rol = rol;
 
-            // 4. Lógica para buscar hijos si el rol es 'acudiente'
+            // 3. Lógica específica para el ACUDIENTE
             if (rol == "acudiente")
             {
-                int userId = int.Parse(userIdStr);
-
-                // 1. Buscar IDs de hijos (Asegúrate que en EstudiantePadre los nombres coincidan)
-                var hijosIds = _context.ESTUDIANTE_PADRE
-                                       .Where(ep => ep.ID_PADRE == userId)
-                                       .Select(ep => ep.ID_ESTUDIANTE)
-                                       .ToList();
-
-                // Traemos los usuarios relacionados a memoria y luego filtramos por el texto "estudiante"
-                var listaHijos = _context.Usuarios
-                    .Where(u => hijosIds.Contains(u.ID_Usuario))
-                    .AsEnumerable() // <--- Esto mueve la lógica a C# para evitar el error de traducción
-                    .Where(u => u.ROL != null && u.ROL.Trim().ToLower() == "estudiante")
-                    .ToList();
-
-                if (listaHijos.Any())
+                // Usamos TryParse para evitar el error de formato (FormatException)
+                if (int.TryParse(userIdStr, out int userId))
                 {
-                    int primerHijoId = listaHijos.First().ID_Usuario;
+                    // Buscar IDs de hijos vinculados
+                    var hijosIds = _context.ESTUDIANTE_PADRE
+                                           .Where(ep => ep.ID_PADRE == userId)
+                                           .Select(ep => ep.ID_ESTUDIANTE)
+                                           .ToList();
 
-                    var promedio = _context.EVALUACIONES
-                                           .Where(e => e.id_estudiante == primerHijoId)
-                                           .Select(e => (double?)e.nota)
-                                           .Average() ?? 0.0;
+                    // Traer la información de los usuarios que son estudiantes
+                    var listaHijos = _context.Usuarios
+                        .Where(u => hijosIds.Contains(u.ID_Usuario))
+                        .AsEnumerable()
+                        .Where(u => u.ROL != null && u.ROL.Trim().ToLower() == "estudiante")
+                        .ToList();
 
-                    var fallas = _context.ASISTENCIAS
-                                         .Count(a => a.id_estudiante == primerHijoId && a.estado == "Falla");
-                    // Dentro del bloque de acudiente en el HomeController:
-                    var listaCitaciones = _context.CITACIONES
-                                                  .Where(c => c.id_estudiante == primerHijoId)
-                                                  .OrderByDescending(c => c.fecha)
-                                                  .ToList();
+                    if (listaHijos.Any())
+                    {
+                        int primerHijoId = listaHijos.First().ID_Usuario;
 
-                    ViewBag.TotalCitaciones = listaCitaciones.Count;
-                    ViewBag.ListaCitaciones = listaCitaciones; // Pasamos la lista completa a la vista
+                        // Promedio de notas
+                        var promedio = _context.EVALUACIONES
+                                               .Where(e => e.id_estudiante == primerHijoId)
+                                               .Select(e => (double?)e.nota)
+                                               .Average() ?? 0.0;
 
-                    ViewBag.DetalleNotas = _context.EVALUACIONES.Where(e => e.id_estudiante == primerHijoId).ToList();
+                        // Contador de fallas
+                        var fallas = _context.ASISTENCIAS
+                                             .Count(a => a.id_estudiante == primerHijoId && a.estado == "Falla");
 
-                    ViewBag.PromedioRapido = promedio.ToString("0.0");
+                        // Citaciones
+                        var listaCitaciones = _context.CITACIONES
+                                                      .Where(c => c.id_estudiante == primerHijoId)
+                                                      .OrderByDescending(c => c.fecha)
+                                                      .ToList();
 
-                    ViewBag.FallasRapidas = fallas;
+                        ViewBag.TotalCitaciones = listaCitaciones.Count;
+                        ViewBag.PromedioRapido = promedio.ToString("0.0");
+                        ViewBag.FallasRapidas = fallas;
+                        ViewBag.ListaHijos = listaHijos;
+                    }
                 }
-
-                ViewBag.ListaHijos = listaHijos;
+                else
+                {
+                    // Si el ID llega corrupto (como el error de la imagen 4), lo mandamos a re-identificarse
+                    return RedirectToAction("Index", "Login");
+                }
             }
 
             return View();
+        }
+        public IActionResult Perfil()
+        {
+            // Cambiamos "IdUsuario" por "UserId" para que coincida con el resto de tu app
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            // Si no hay sesión, regresamos al Login
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Buscamos al usuario por su ID
+            var usuario = _context.Usuarios.Find(userId);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            return View(usuario);
+        }
+        // 1. Mostrar el formulario de edición
+        public IActionResult EditarPerfil()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Index", "Login");
+
+            var usuario = _context.Usuarios.Find(userId);
+            return View(usuario);
+        }
+
+        // 2. Procesar la actualización
+        [HttpPost]
+        public IActionResult ActualizarPerfil(Usuario usuarioEditado)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Index", "Login");
+
+            var usuarioBd = _context.Usuarios.Find(userId);
+            if (usuarioBd != null)
+            {
+                // Actualizamos solo los campos permitidos por el RF3.2
+                usuarioBd.TELEFONO = usuarioEditado.TELEFONO;
+                usuarioBd.DIRECCION = usuarioEditado.DIRECCION;
+                usuarioBd.CORREO_ELECTRONICO = usuarioEditado.CORREO_ELECTRONICO;
+                // La foto requiere una lógica extra para guardar el archivo, 
+                // por ahora aseguremos los datos de texto.
+
+                _context.SaveChanges();
+
+                // Actualizamos el nombre en sesión por si cambió el correo o algo importante
+                TempData["Mensaje"] = "Perfil actualizado correctamente";
+            }
+
+            return RedirectToAction("Perfil");
         }
 
         // Otros métodos existentes
