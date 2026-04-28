@@ -1,6 +1,10 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\logo.png
+<<<<<<< Updated upstream
+=======
+wwwroot\images\perfiles\admin.png
+>>>>>>> Stashed changes
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
